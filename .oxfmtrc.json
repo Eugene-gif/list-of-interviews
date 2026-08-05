@@ -1,0 +1,24 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "semi": true,
+  "singleQuote": true,
+  "indent": 2, // Размер отступа (2 пробела)
+  "useTabs": true, // Использовать пробелы вместо табуляции
+  "printWidth": 100, // Максимальная длина строки
+  "bracketSpacing": true, // Пробелы внутри скобок { foo: bar }
+  "endOfLine": "lf", // Символы конца строки (LF для Unix/Mac)
+  "overrides": [
+    {
+      "files": [
+        "*.vue", "*.css", "*.ts"
+      ],
+      "options": {
+        "vueIndentScriptAndStyle": true,
+        "vueIndentTemplate": true,
+        "scriptIndent": 2,
+        "styleIndent": 2,
+        "templateIndent": 2
+      }
+    },
+  ],
+}

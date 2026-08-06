@@ -5,11 +5,13 @@
 </script>
 
 <template>
-	<h1>Некоторый тестовый контент</h1>
-	<div class="block">
-		<InputText v-model="text" />
-		{{ text }}
-		<Button label="Кнопка" />
+	<div class="page page-home">
+		<h1>Главная</h1>
+		<div class="block">
+			<InputText v-model="text" />
+			{{ text }}
+			<Button label="Кнопка" />
+		</div>
 	</div>
 </template>
 

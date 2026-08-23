@@ -15,6 +15,7 @@
     "format": "oxfmt src/"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.3",
     "pinia": "^4.0.2",
     "primeflex": "^3.3.1",
     "primeicons": "^7.0.0",

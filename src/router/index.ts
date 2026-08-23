@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import type { RouteRecordRaw } from 'vue-router';
-import { useUserStore } from '@/stores/user';
+import { useAuthStore } from '@/stores/auth';
 
 const routes: RouteRecordRaw[] = [
   {
@@ -46,14 +46,14 @@ const router = createRouter({
 });
 
 router.beforeEach((to) => {
-  const userStore = useUserStore();
-  const isLogin = !!userStore.userId;
+  const authStore = useAuthStore();
+  const isAuth = authStore.isAuth;
   const requiresAuth = to.meta.requiresAuth;
 
   // Проверяем, что мы уже НЕ идем на страницу Auth, чтобы избежать бесконечного цикла
-  if (requiresAuth && !isLogin && to.name !== 'Auth') return { name: 'Auth' };
+  if (requiresAuth && !isAuth && to.name !== 'Auth') return { name: 'Auth' };
   // Если мы авторизованы и стучимся на Auth то отправляем на Home
-  if (!requiresAuth && isLogin && to.name === 'Auth') return { name: 'Home' };
+  if (!requiresAuth && isAuth && to.name === 'Auth') return { name: 'Home' };
 })
 
 export default router;

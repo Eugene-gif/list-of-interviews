@@ -1,12 +1,15 @@
 <script setup lang="ts">
 	import { RouterView } from 'vue-router';
-  import HeaderApp from '@/components/HeaderApp.vue';
+	import HeaderApp from '@/components/HeaderApp.vue';
 </script>
 
 <template>
+	<Toast position="top-center" />
 	<div class="container">
 		<HeaderApp />
-		<div class="content"><RouterView /></div>
+		<div class="content">
+			<RouterView />
+		</div>
 	</div>
 </template>
 

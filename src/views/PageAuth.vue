@@ -1,9 +1,80 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+	import { computed } from 'vue';
+	import { useAuthStore } from '@/stores/auth';
+	import { storeToRefs } from 'pinia';
+
+	const authStore = useAuthStore();
+	const { email, password, isLogin, isLoading } = storeToRefs(authStore);
+	const { signUp, signIn } = authStore;
+
+	const subTitleText = computed<string>(() =>
+		isLogin.value ? 'Аккаунта ещё нет?' : 'Уже есть аккаунт?',
+	);
+	const linkAccountText = computed<string>(() => (isLogin.value ? 'Создайте сейчас' : 'Войдите'));
+	const submitButtonText = computed(() => (isLogin.value ? 'Вход' : 'Регистрация'));
+
+	const toggleAuth = () => {
+		isLogin.value = !isLogin.value;
+	};
+
+	const submitForm = async () => {
+		if (isLogin.value) {
+			await signIn();
+			return;
+		}
+
+		await signUp();
+	};
+</script>
 
 <template>
 	<div class="page page-auth">
-		<h1>Page Auth</h1>
+		<div class="surface-card p-4 shadow-2 border-round w-full lg:w-6">
+			<div class="text-center mb-3">
+				<div class="text-900 text-3xl font-medium mb-3">Приветствую!</div>
+				<span class="text-600 font-medium line-height-3">{{ subTitleText }}</span>
+				<a class="font-medium no-underline ml-2 text-blue-500 cursor-pointer" @click="toggleAuth">
+					{{ linkAccountText }}
+				</a>
+			</div>
+
+			<form @submit.prevent="submitForm">
+				<label for="email1" class="block text-900 font-medium mb-2">Email</label>
+				<InputText
+					v-model="email"
+					id="email1"
+					type="email"
+					class="w-full mb-3"
+					autocomplete="email"
+				/>
+
+				<label for="password1" class="block text-900 font-medium mb-2">Пароль</label>
+				<Password
+					v-model="password"
+					toggleMask
+					:feedback="false"
+					class="w-full mb-3"
+					inputClass="w-full"
+					:inputProps="{ autocomplete: 'current-password', id: 'password1' }"
+				/>
+
+				<Button
+					:label="submitButtonText"
+					type="submit"
+					:severity="isLogin ? 'success' : ''"
+					icon="pi pi-user"
+					:loading="isLoading"
+					class="w-full"
+				/>
+			</form>
+		</div>
 	</div>
 </template>
 
-<style scoped></style>
+<style scoped>
+	.page-auth {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+</style>

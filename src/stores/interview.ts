@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue';
+import { ref, computed, reactive } from 'vue';
 import { defineStore } from 'pinia';
 import { supabase } from '@/utils/supabase';
 import { useAuthStore } from '@/stores/auth';
@@ -6,35 +6,50 @@ import { storeToRefs } from 'pinia';
 import { useNotifications } from '@/composables/useNotifications';
 import type { InterviewApp } from '@/types';
 
+const getInitialFormState = (): InterviewApp => ({
+  company: '',
+  vacancy_link: '',
+  hr_name: '',
+  contact_email: '',
+  contact_telegram: '',
+  contact_whatsapp: '',
+  contact_phone: ''
+})
+
 export const useInterviewStore = defineStore('interview', () => {
   const authStore = useAuthStore();
   const { user } = storeToRefs(authStore);
   const { showSuccess, showError } = useNotifications();
 
-  const title = ref('');
   const userId = computed(() => user.value?.id ?? '');
-  const completed = ref(false);
   const interviewList = ref<InterviewApp[]>([]);
   const isLoading = ref<boolean>(false);
   const isLoadingDelete = ref<boolean>(false);
   const currentItemId = ref<string>('');
 
+  const interviewForm = reactive<InterviewApp>(getInitialFormState());
+
+  const resetForm = () => {
+    Object.assign(interviewForm, getInitialFormState());
+  }
+
   const createInterview = async () => {
-    if (!title.value.trim()) showError('', 'Введите текст в поле ввода', 2000);
     isLoading.value = true;
     try {
+      const payload = {
+        ...interviewForm,
+        user_id: userId.value,
+      };
+
       const { error } = await supabase
         .from('interviews')
         .insert([
-          {
-            user_id: userId.value,
-            title: title.value,
-          },
+          payload
         ]).select();
 
       if (error) throw error;
       showSuccess('Запись создана', '', 1000);
-      title.value = '';
+      resetForm();
     } catch (err: any) {
       showError(err.message);
     } finally {
@@ -49,8 +64,6 @@ export const useInterviewStore = defineStore('interview', () => {
         .from('interviews')
         .update({
           user_id: userId.value,
-          title: title.value.trim(),
-          completed: completed.value,
         })
         .select()
 
@@ -108,5 +121,5 @@ export const useInterviewStore = defineStore('interview', () => {
 
   console.log('✅ Init interview store');
 
-  return { title, userId, interviewList, isLoading, isLoadingDelete, currentItemId, createInterview, updateInterview, deleteInterviewById, getInterviews };
+  return { userId, interviewList, interviewForm, isLoading, isLoadingDelete, currentItemId, createInterview, updateInterview, deleteInterviewById, getInterviews };
 })

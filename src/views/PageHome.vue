@@ -1,50 +1,81 @@
 <script setup lang="ts">
-	import { ref, type ComponentPublicInstance } from 'vue';
+	import { ref, computed, type ComponentPublicInstance } from 'vue';
 	import { useInterviewStore } from '@/stores/interview';
 	import { storeToRefs } from 'pinia';
 
 	const interviewStore = useInterviewStore();
-	const { title, isLoading } = storeToRefs(interviewStore);
+	const { interviewForm, isLoading } = storeToRefs(interviewStore);
 	const { createInterview } = interviewStore;
 
 	const inputRef = ref<ComponentPublicInstance | null>(null);
 
-	const createItem = async () => {
+	const createNewInterview = async () => {
 		await createInterview();
-    if (inputRef.value?.$el) {
-      inputRef.value.$el.focus();
-    }
+		if (inputRef.value?.$el) {
+			inputRef.value.$el.focus();
+		}
 	};
+
+	const disabledSaveButton = computed(() => {
+		return !(
+			interviewForm.value.company &&
+			interviewForm.value.vacancy_link &&
+			interviewForm.value.hr_name
+		);
+	});
 </script>
 
 <template>
 	<div class="page page-home">
-		<h1>Главная</h1>
-		<div class="block">
-			<InputText v-model="title" :disabled="isLoading" ref="inputRef" />
+		<Card>
+			<template #title>Новое собеседование</template>
+			<template #content>
+				<InputText v-model="interviewForm.company" class="input mb-3" placeholder="Компания" />
+				<InputText
+					v-model="interviewForm.vacancy_link"
+					class="input mb-3"
+					placeholder="Описание вакансии (ссылка)"
+				/>
+				<InputText v-model="interviewForm.hr_name" class="input mb-3" placeholder="Контакт (имя)" />
+				<InputText
+					v-model="interviewForm.contact_telegram"
+					class="input mb-3"
+					placeholder="Telegram username HR"
+				/>
+				<InputText
+					v-model="interviewForm.contact_whatsapp"
+					class="input mb-3"
+					placeholder="WhatsApp HR"
+				/>
+				<InputText
+					v-model="interviewForm.contact_phone"
+					class="input mb-3"
+					placeholder="Телефон HR"
+				/>
+				<InputText
+					v-model="interviewForm.contact_email"
+					class="input mb-3"
+					placeholder="Email HR"
+				/>
 
-			<Button
-				label="Создать"
-				icon="pi pi-plus"
-				@click="createItem"
-				:disabled="!title.trim()"
-				:loading="isLoading"
-			/>
-		</div>
+				<Button
+					@click="createNewInterview"
+					label="Создать собеседование"
+					:disabled="disabledSaveButton"
+					:loading="isLoading"
+				/>
+			</template>
+		</Card>
 	</div>
 </template>
 
 <style scoped>
-	.block {
-		display: flex;
-		flex-direction: column;
-		gap: 10px;
+	.page-home {
+		margin: auto;
+		max-width: 600px;
 	}
 
-	.email {
-		max-width: 600px;
-		overflow-wrap: break-word;
-		hyphens: auto;
-		text-wrap: pretty;
+	.input {
+		width: 100%;
 	}
 </style>

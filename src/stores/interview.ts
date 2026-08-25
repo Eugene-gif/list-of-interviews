@@ -4,6 +4,7 @@ import { supabase } from '@/utils/supabase';
 import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia';
 import { useNotifications } from '@/composables/useNotifications';
+import { clearPhone } from '@/utils/formatPhone';
 import type { InterviewApp } from '@/types';
 
 const getInitialFormState = (): InterviewApp => ({
@@ -38,6 +39,7 @@ export const useInterviewStore = defineStore('interview', () => {
     try {
       const payload = {
         ...interviewForm,
+        contact_phone: clearPhone(interviewForm.contact_phone ?? ''),
         user_id: userId.value,
       };
 
@@ -91,7 +93,7 @@ export const useInterviewStore = defineStore('interview', () => {
 
       if (error) throw error;
 
-      showSuccess('Элемент удалён', '', 1000);
+      showSuccess('Запись удалёна', '', 1000);
     } catch (err: any) {
       showError(err.message);
     } finally {

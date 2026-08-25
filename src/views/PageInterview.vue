@@ -2,7 +2,7 @@
 
 <template>
 	<div class="page page-interview">
-		<h1>Page Interview</h1>
+		<h1>Редактирование собеседования</h1>
 	</div>
 </template>
 

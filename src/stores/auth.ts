@@ -67,7 +67,7 @@ export const useAuthStore = defineStore('auth', () => {
       refreshUser(data.session);
       refreshSession(data.session);
       router.push('/');
-      showSuccess('Добро пожаловать!');
+      showSuccess('Добро пожаловать!', 'Успешный вход', 3000);
     } catch (err: any) {
       showError(err.message ?? 'Ошибка входа в профиль. Попробуйте позже.');
     } finally {
@@ -95,7 +95,7 @@ export const useAuthStore = defineStore('auth', () => {
       refreshUser(data.session);
       refreshSession(data.session);
       router.push('/');
-      showSuccess('', 'Вы успешно зарегистрировались!', 2000);
+      showSuccess('Добро пожаловать!', 'Успешная регистрация', 3000);
     } catch (err: any) {
       showError(err.message ?? 'Ошибка регистрации. Попробуйте позже.');
     } finally {

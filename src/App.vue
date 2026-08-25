@@ -5,6 +5,7 @@
 
 <template>
 	<Toast position="top-center" />
+	<ConfirmDialog group="dialog" />
 	<div class="container">
 		<HeaderApp />
 		<div class="content">

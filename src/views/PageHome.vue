@@ -30,11 +30,11 @@
 		<Card>
 			<template #title>Новое собеседование</template>
 			<template #content>
-				<InputText v-model="interviewForm.company" class="input mb-3" placeholder="Компания" />
+				<InputText v-model="interviewForm.company" ref="inputRef" class="input mb-3" placeholder="Компания" />
 				<InputText
 					v-model="interviewForm.vacancy_link"
 					class="input mb-3"
-					placeholder="Описание вакансии (ссылка)"
+					placeholder="Ссылка на вакансию"
 				/>
 				<InputText v-model="interviewForm.hr_name" class="input mb-3" placeholder="Контакт (имя)" />
 				<InputText
@@ -47,11 +47,14 @@
 					class="input mb-3"
 					placeholder="WhatsApp HR"
 				/>
-				<InputText
+
+				<InputMask
 					v-model="interviewForm.contact_phone"
 					class="input mb-3"
-					placeholder="Телефон HR"
+					mask="+7 (999) 999-99-99"
+					placeholder="+7 (___) ___-__-__"
 				/>
+
 				<InputText
 					v-model="interviewForm.contact_email"
 					class="input mb-3"

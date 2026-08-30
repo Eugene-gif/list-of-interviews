@@ -4,6 +4,9 @@
 	import { useConfirmApp } from '@/composables/useConfirmApp';
 	import { storeToRefs } from 'pinia';
 	import { formatPhoneForUI, clearPhone } from '@/utils/formatPhone';
+	import { useNotifications } from '@/composables/useNotifications';
+  
+	const { showSuccess, showError } = useNotifications();
 
 	const interviewStore = useInterviewStore();
 	const { confirmDeletePopup } = useConfirmApp();
@@ -11,32 +14,53 @@
 	const { interviewList, isLoading, isLoadingDelete, currentItemId } = storeToRefs(interviewStore);
 	const { getInterviews, deleteInterviewById } = interviewStore;
 
+	const copyToClipboard = async (text: string) => {
+		try {
+			await navigator.clipboard.writeText(text);
+			showSuccess('Ссылка скопирована в буфер обмена', '', 2000);
+		} catch {
+			showError('Не получилось скопировать ссылку, попробуйте позже', 'Ошибка копирования', 2000);
+		}
+	};
+
 	onMounted(getInterviews);
 </script>
 
 <template>
-	<ConfirmPopup group="popup" />
 	<div class="page page-list">
 		<h1>Список собеседований</h1>
 		<div v-if="interviewList.length && !isLoading" class="interview-list">
-			<DataTable class="table" :value="interviewList">
-				<Column field="company" header="Компания" />
-				<Column field="hr_name" header="Имя HR" />
-				<Column field="vacancy_link" header="Вакансия">
+			<DataTable class="table" :value="interviewList" responsiveLayout="stack">
+				<Column field="company" header="Компания" class="custom-column" />
+				<Column field="hr_name" header="Имя HR" class="custom-column" />
+				<Column field="vacancy_link" header="Вакансия" class="custom-column">
 					<template #body="slotProps">
-						<a
-							v-if="slotProps.data.vacancy_link"
-							class="vacancy"
-							:href="slotProps.data.vacancy_link"
-							target="_blank"
-							rel="noopener noreferrer"
-							>{{ slotProps.data.vacancy_link }}</a
-						>
-						<span class="vacancy" v-else>Не заполнено</span>
+						<div v-if="slotProps.data.vacancy_link" class="vacancy">
+							<a
+								class="vacancy__link"
+								v-tooltip.bottom="{ value: slotProps.data.vacancy_link, autoHide: false }"
+								:href="slotProps.data.vacancy_link"
+								target="_blank"
+								rel="noopener noreferrer"
+								>{{ slotProps.data.vacancy_link }}</a
+							>
+							<Button
+								class="vacancy__copy"
+								icon="pi pi-copy"
+								severity="secondary"
+								text
+								rounded
+								size="small"
+								v-tooltip.top="'Скопировать ссылку'"
+								@click="copyToClipboard(slotProps.data.vacancy_link)"
+							/>
+						</div>
+
+						<span class="vacancy" v-else>Нет ссылки</span>
 					</template>
 				</Column>
 
-				<Column header="Контакты">
+				<Column header="Контакты" class="custom-column">
 					<template #body="propsSlot">
 						<div class="contacts">
 							<div class="contacts__social">
@@ -84,10 +108,10 @@
 					</template>
 				</Column>
 
-				<Column header="Действия">
+				<Column header="Действия" class="custom-column">
 					<template #body="propsSlot">
 						<div class="flex gap-2">
-							<RouterLink :to="`/interview/${propsSlot.data.id}`">
+							<RouterLink :to="`/interview/${propsSlot.data.id}`" v-tooltip.top="'Редактировать'">
 								<Button icon="pi pi-pencil" severity="info" />
 							</RouterLink>
 
@@ -95,6 +119,7 @@
 								class="item-btn-delete"
 								severity="danger"
 								icon="pi pi-trash"
+								v-tooltip.top="'Удалить'"
 								@click="confirmDeletePopup($event, propsSlot.data.id, deleteInterviewById)"
 								:disabled="isLoadingDelete"
 								:loading="currentItemId === propsSlot.data.id"
@@ -114,6 +139,19 @@
 </template>
 
 <style scoped>
+	.vacancy {
+		display: flex;
+		align-items: center;
+		gap: 5px;
+
+		.vacancy__link {
+			max-width: 100px;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
+	}
+
 	.contacts {
 		display: flex;
 		align-items: center;
@@ -157,5 +195,25 @@
 		font-size: 20px;
 		color: grey;
 		font-weight: 600;
+	}
+
+	@media screen and (max-width: 960px) {
+		:deep(.custom-column) {
+			gap: 20px;
+		}
+
+		.vacancy {
+			.vacancy__link {
+				max-width: 100%;
+				overflow: visible;
+				white-space: normal;
+				word-break: break-all;
+				text-overflow: clip;
+			}
+
+			.vacancy__copy {
+				display: none;
+			}
+		}
 	}
 </style>

@@ -6,6 +6,7 @@
 <template>
 	<Toast position="top-center" />
 	<ConfirmDialog group="dialog" />
+  <ConfirmPopup group="popup" />
 	<div class="container">
 		<HeaderApp />
 		<div class="content">

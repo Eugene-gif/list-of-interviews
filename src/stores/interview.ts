@@ -5,7 +5,8 @@ import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia';
 import { useNotifications } from '@/composables/useNotifications';
 import { clearPhone } from '@/utils/formatPhone';
-import type { InterviewApp } from '@/types';
+import { formatDateToObjDate, formatDateToString } from '@/utils/date';
+import type { InterviewApp, StageDB } from '@/types';
 
 const getInitialFormState = (): InterviewApp => ({
   company: '',
@@ -14,7 +15,11 @@ const getInitialFormState = (): InterviewApp => ({
   contact_email: '',
   contact_telegram: '',
   contact_whatsapp: '',
-  contact_phone: ''
+  contact_phone: '',
+  salary_from: 0,
+  salary_to: 0,
+  stages: [],
+  status: 'Pending'
 })
 
 export const useInterviewStore = defineStore('interview', () => {
@@ -29,6 +34,7 @@ export const useInterviewStore = defineStore('interview', () => {
   const currentItemId = ref<string>('');
 
   const interviewForm = reactive<InterviewApp>(getInitialFormState());
+  const singleInterview = ref<InterviewApp | null>(null);
 
   const resetForm = () => {
     Object.assign(interviewForm, getInitialFormState());
@@ -62,16 +68,25 @@ export const useInterviewStore = defineStore('interview', () => {
   const updateInterview = async () => {
     isLoading.value = true;
     try {
-      const { data, error } = await supabase
-        .from('interviews')
-        .update({
-          user_id: userId.value,
+      const payload = {
+        ...singleInterview.value,
+        contact_phone: clearPhone(singleInterview.value?.contact_phone ?? ''),
+        stages: singleInterview.value?.stages.map((stage) => {
+          return {
+            ...stage, date: formatDateToString(stage.date)
+          }
         })
-        .select()
+      };
+
+      const { data: interview, error } = await supabase
+        .from('interviews')
+        .update([payload])
+        .eq('id', payload.id)
+        .select();
 
       if (error) throw error;
-      console.log('createInterview(): ', data);
-      showSuccess('Запись обновлена');
+      console.log('updateInterview(): ', interview);
+      showSuccess('Изменения сохранены', 'Успешно', 2000);
     } catch (err: any) {
       showError(err.message);
     } finally {
@@ -102,6 +117,35 @@ export const useInterviewStore = defineStore('interview', () => {
     }
   }
 
+  const getInterviewById = async (id: string) => {
+    if (!id) return;
+    isLoading.value = true;
+
+    try {
+      const { data: interview, error } = await supabase
+        .from('interviews')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (!interview) {
+        showError(`Запись с id "${id}" не найдена`, 'Ошибка запроса', 2000);
+      }
+
+      singleInterview.value = {
+        ...interview, stages: interview.stages.map((stage: StageDB) => {
+          return { ...stage, date: formatDateToObjDate(stage.date) };
+        })
+      };
+    } catch (err: any) {
+      showError(err.message);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   const getInterviews = async () => {
     isLoading.value = true;
     try {
@@ -123,5 +167,5 @@ export const useInterviewStore = defineStore('interview', () => {
 
   console.log('✅ Init interview store');
 
-  return { userId, interviewList, interviewForm, isLoading, isLoadingDelete, currentItemId, createInterview, updateInterview, deleteInterviewById, getInterviews };
+  return { userId, interviewList, interviewForm, singleInterview, isLoading, isLoadingDelete, currentItemId, createInterview, updateInterview, deleteInterviewById, getInterviewById, getInterviews };
 })

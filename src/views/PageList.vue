@@ -1,11 +1,11 @@
 <script setup lang="ts">
-	import { onMounted } from 'vue';
+	import { computed, onMounted } from 'vue';
 	import { useInterviewStore } from '@/stores/interview';
 	import { useConfirmApp } from '@/composables/useConfirmApp';
 	import { storeToRefs } from 'pinia';
 	import { formatPhoneForUI, clearPhone } from '@/utils/formatPhone';
 	import { useNotifications } from '@/composables/useNotifications';
-  
+
 	const { showSuccess, showError } = useNotifications();
 
 	const interviewStore = useInterviewStore();
@@ -13,6 +13,18 @@
 
 	const { interviewList, isLoading, isLoadingDelete, currentItemId } = storeToRefs(interviewStore);
 	const { getInterviews, deleteInterviewById } = interviewStore;
+
+	const styleBadge = (status: 'Offer' | 'Refusal' | 'Pending') => {
+		if (!status) return '';
+
+		const colorStatus = {
+			Offer: ['success', 'Оффер'],
+			Refusal: ['danger', 'Отказ'],
+			Pending: ['warning', 'Ожидание'],
+		};
+
+		return colorStatus[status];
+	};
 
 	const copyToClipboard = async (text: string) => {
 		try {
@@ -22,6 +34,13 @@
 			showError('Не получилось скопировать ссылку, попробуйте позже', 'Ошибка копирования', 2000);
 		}
 	};
+
+	const formatNumber = (num: number) => {
+		if (typeof num !== 'number') return 0;
+		return num.toLocaleString('ru-RU', { maximumFractionDigits: 0 });
+	};
+
+	// const
 
 	onMounted(getInterviews);
 </script>
@@ -108,6 +127,49 @@
 					</template>
 				</Column>
 
+				<Column header="Этапы" class="custom-column">
+					<template #body="propsSlot" field="stages">
+						<Badge
+							v-if="!propsSlot.data.stages.length"
+							value="0"
+							severity="info"
+							rounded
+							v-tooltip.top="'Нет добавленных этапов'"
+						/>
+						<div v-else class="interview-stages">
+							<template v-for="(stage, idx) in propsSlot.data.stages" :key="stage.id">
+								<Badge
+									:value="Number(idx) + 1"
+									severity="warning"
+									rounded
+									v-tooltip.top="stage.name"
+								/>
+							</template>
+						</div>
+					</template>
+				</Column>
+
+				<Column header="Зарплатная вилка" class="custom-column">
+					<template #body="propsSlot">
+						<span v-if="!propsSlot.data.salary_from">Не заполнено</span>
+						<span v-else
+							>{{ formatNumber(propsSlot.data.salary_from) }}
+							-
+							{{ formatNumber(propsSlot.data.salary_to) }}</span
+						>
+					</template>
+				</Column>
+
+				<Column header="Статус" class="custom-column">
+					<template #body="propsSlot" field="status">
+						<Badge
+							:value="styleBadge(propsSlot.data.status)[1]"
+							:severity="styleBadge(propsSlot.data.status)[0]"
+							rounded
+						/>
+					</template>
+				</Column>
+
 				<Column header="Действия" class="custom-column">
 					<template #body="propsSlot">
 						<div class="flex gap-2">
@@ -183,6 +245,12 @@
 		.contacts__icon {
 			font-size: 20px;
 		}
+	}
+
+	.interview-stages {
+		display: flex;
+		align-items: center;
+		gap: 5px;
 	}
 
 	.loader {

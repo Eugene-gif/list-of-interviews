@@ -1,5 +1,5 @@
 <script setup lang="ts">
-	import { ref, computed, watch, onMounted } from 'vue';
+	import { computed, watch } from 'vue';
 	import { storeToRefs } from 'pinia';
 	import { useRoute } from 'vue-router';
 	import { useInterviewStore } from '@/stores/interview';
@@ -41,10 +41,6 @@
 		},
 		{ immediate: true },
 	);
-
-	onMounted(() => {
-		console.log('singleInterview: ', singleInterview.value);
-	});
 </script>
 
 <template>
@@ -279,8 +275,8 @@
 		p {
 			margin: 0;
 			color: lightgrey;
-      font-size: 24px;
-      font-weight: 600;
+			font-size: 24px;
+			font-weight: 600;
 		}
 	}
 </style>

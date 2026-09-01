@@ -85,7 +85,6 @@ export const useInterviewStore = defineStore('interview', () => {
         .select();
 
       if (error) throw error;
-      console.log('updateInterview(): ', interview);
       showSuccess('Изменения сохранены', 'Успешно', 2000);
     } catch (err: any) {
       showError(err.message);

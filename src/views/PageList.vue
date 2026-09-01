@@ -1,12 +1,15 @@
 <script setup lang="ts">
-	import { computed, onMounted } from 'vue';
+	import { ref, computed, watch, onMounted } from 'vue';
 	import { useInterviewStore } from '@/stores/interview';
 	import { useConfirmApp } from '@/composables/useConfirmApp';
 	import { storeToRefs } from 'pinia';
 	import { formatPhoneForUI, clearPhone } from '@/utils/formatPhone';
 	import { useNotifications } from '@/composables/useNotifications';
+	import { useSortTable } from '@/composables/useSortTable';
+	import type { InterviewApp } from '@/types';
 
 	const { showSuccess, showError } = useNotifications();
+	const { currentField, sortState, originalList, customSort } = useSortTable();
 
 	const interviewStore = useInterviewStore();
 	const { confirmDeletePopup } = useConfirmApp();
@@ -40,7 +43,15 @@
 		return num.toLocaleString('ru-RU', { maximumFractionDigits: 0 });
 	};
 
-	// const
+	watch(
+		() => interviewList.value,
+		(newVal) => {
+			if (newVal.length && !originalList.value.length) {
+				originalList.value = [...newVal];
+			}
+		},
+		{ deep: true },
+	);
 
 	onMounted(getInterviews);
 </script>
@@ -49,7 +60,7 @@
 	<div class="page page-list">
 		<h1>Список собеседований</h1>
 		<div v-if="interviewList.length && !isLoading" class="interview-list">
-			<DataTable class="table" :value="interviewList" responsiveLayout="stack">
+			<DataTable class="table" :value="interviewList" responsiveLayout="stack" removableSort>
 				<Column field="company" header="Компания" class="custom-column" />
 				<Column field="hr_name" header="Имя HR" class="custom-column" />
 				<Column field="vacancy_link" header="Вакансия" class="custom-column">
@@ -109,38 +120,61 @@
 									class="contacts__email"
 									target="_blank"
 									rel="noopener noreferrer"
+									v-tooltip.top="{
+										value: propsSlot.data.contact_email,
+										autoHide: false,
+									}"
 								>
 									<span class="contacts__icon pi pi-envelope"></span>
 								</a>
-							</div>
 
-							<a
-								v-if="propsSlot.data.contact_phone"
-								:href="`tel:+${clearPhone(propsSlot.data.contact_phone)}`"
-								class="contacts__phone"
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								{{ formatPhoneForUI(propsSlot.data.contact_phone) }}
-							</a>
+								<a
+									v-if="propsSlot.data.contact_phone"
+									:href="`tel:+${clearPhone(propsSlot.data.contact_phone)}`"
+									class="contacts__phone"
+									target="_blank"
+									rel="noopener noreferrer"
+									v-tooltip.top="{
+										value: formatPhoneForUI(propsSlot.data.contact_phone),
+										autoHide: false,
+									}"
+								>
+									<span class="contacts__icon pi pi-phone"></span>
+								</a>
+							</div>
 						</div>
 					</template>
 				</Column>
 
-				<Column header="Этапы" class="custom-column">
-					<template #body="propsSlot" field="stages">
+				<Column class="custom-column">
+					<template #header>
+						<span @click="customSort('stages')" class="custom-header color-blue-6">
+							<span>Этапы</span>
+							<span
+								v-if="currentField === 'stages' && sortState === 'asc'"
+								class="pi pi-arrow-up text-green-400"
+							></span>
+							<span
+								v-else-if="currentField === 'stages' && sortState === 'desc'"
+								class="pi pi-arrow-down text-red-400"
+							></span>
+							<span v-else class="pi pi-sort-alt text-gray-500"></span>
+						</span>
+					</template>
+
+					<template #body="propsSlot">
 						<Badge
 							v-if="!propsSlot.data.stages.length"
 							value="0"
-							severity="info"
+							class="bg-gray-400"
 							rounded
-							v-tooltip.top="'Нет добавленных этапов'"
+							v-tooltip.top="'Нет этапов'"
 						/>
 						<div v-else class="interview-stages">
 							<template v-for="(stage, idx) in propsSlot.data.stages" :key="stage.id">
 								<Badge
 									:value="Number(idx) + 1"
-									severity="warning"
+									class="bg-blue-300"
 									rounded
 									v-tooltip.top="stage.name"
 								/>
@@ -149,18 +183,44 @@
 					</template>
 				</Column>
 
-				<Column header="Зарплатная вилка" class="custom-column">
+				<Column class="custom-column">
+					<template #header>
+						<span @click="customSort('salary_to')" class="custom-header">
+							<span>Оклад</span>
+							<span
+								v-if="currentField === 'salary_to' && sortState === 'asc'"
+								class="pi pi-arrow-up text-green-400"
+							></span>
+							<span
+								v-else-if="currentField === 'salary_to' && sortState === 'desc'"
+								class="pi pi-arrow-down text-red-400"
+							></span>
+							<span v-else class="pi pi-sort-alt text-gray-500"></span>
+						</span>
+					</template>
+
 					<template #body="propsSlot">
 						<span v-if="!propsSlot.data.salary_from">Не заполнено</span>
-						<span v-else
-							>{{ formatNumber(propsSlot.data.salary_from) }}
-							-
-							{{ formatNumber(propsSlot.data.salary_to) }}</span
-						>
+						<span v-else> {{ formatNumber(propsSlot.data.salary_to) }}</span>
 					</template>
 				</Column>
 
-				<Column header="Статус" class="custom-column">
+				<Column class="custom-column">
+					<template #header>
+						<span @click="customSort('status')" class="custom-header">
+							<span> Статус </span>
+							<span
+								v-if="currentField === 'status' && sortState === 'asc'"
+								class="pi pi-arrow-up text-green-400"
+							></span>
+							<span
+								v-else-if="currentField === 'status' && sortState === 'desc'"
+								class="pi pi-arrow-down text-red-400"
+							></span>
+							<span v-else class="pi pi-sort-alt text-gray-500"></span>
+						</span>
+					</template>
+
 					<template #body="propsSlot" field="status">
 						<Badge
 							:value="styleBadge(propsSlot.data.status)[1]"
@@ -239,7 +299,7 @@
 		}
 
 		.contacts__phone {
-			color: #371777;
+			color: #838383;
 		}
 
 		.contacts__icon {
@@ -263,6 +323,20 @@
 		font-size: 20px;
 		color: grey;
 		font-weight: 600;
+	}
+
+	:deep(.custom-column) {
+		.custom-header {
+			cursor: pointer;
+			user-select: none;
+			display: flex;
+			align-items: center;
+			gap: 5px;
+		}
+
+		.p-badge {
+			cursor: default;
+		}
 	}
 
 	@media screen and (max-width: 960px) {

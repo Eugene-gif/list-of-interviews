@@ -18,6 +18,8 @@ declare module 'vue' {
     Chip: typeof import('primevue/chip')['default']
     Column: typeof import('primevue/column')['default']
     DataTable: typeof import('primevue/datatable')['default']
+    FilterTable: typeof import('./src/components/FilterTable.vue')['default']
+    FooterApp: typeof import('./src/components/FooterApp.vue')['default']
     HeaderApp: typeof import('./src/components/HeaderApp.vue')['default']
     IconField: typeof import('primevue/iconfield')['default']
     InputIcon: typeof import('primevue/inputicon')['default']
@@ -26,6 +28,7 @@ declare module 'vue' {
     InputText: typeof import('primevue/inputtext')['default']
     Menu: typeof import('primevue/menu')['default']
     Menubar: typeof import('primevue/menubar')['default']
+    Panel: typeof import('primevue/panel')['default']
     Password: typeof import('primevue/password')['default']
     ProgressSpinner: typeof import('primevue/progressspinner')['default']
     RadioButton: typeof import('primevue/radiobutton')['default']
@@ -33,5 +36,6 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     Tag: typeof import('primevue/tag')['default']
     Textarea: typeof import('primevue/textarea')['default']
+    Toolbar: typeof import('primevue/toolbar')['default']
   }
 }

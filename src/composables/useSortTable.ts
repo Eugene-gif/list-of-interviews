@@ -39,7 +39,7 @@ export function useSortTable() {
       let value1 = a[field as keyof typeof a];
       let value2 = b[field as keyof typeof b];
 
-      // Обработка пустых значений
+      // 0. Обработка пустых значений
       if (value1 == null && value2 != null) return 1;
       if (value1 != null && value2 == null) return -1;
       if (value1 == null && value2 == null) return 0;

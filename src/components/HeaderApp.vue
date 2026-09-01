@@ -106,6 +106,7 @@
 		position: sticky;
 		top: 0;
 		left: 0;
+    z-index: 1;
 	}
 
 	.router-link-active.router-link-exact-active {

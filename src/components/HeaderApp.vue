@@ -102,7 +102,10 @@
 
 <style scoped>
 	.menu {
-		margin: 30px 0;
+		margin: 10px 0;
+		position: sticky;
+		top: 0;
+		left: 0;
 	}
 
 	.router-link-active.router-link-exact-active {

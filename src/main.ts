@@ -8,6 +8,7 @@ import ConfirmationService from 'primevue/confirmationservice';
 import ConfirmPopup from 'primevue/confirmpopup';
 import ConfirmDialog from 'primevue/confirmdialog';
 import Toast from 'primevue/toast';
+import Tooltip from 'primevue/tooltip';
 
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
@@ -27,4 +28,5 @@ app.use(ToastService)
 app.component('ConfirmDialog', ConfirmDialog)
 app.component('ConfirmPopup', ConfirmPopup)
 app.component('Toast', Toast)
+app.directive('tooltip', Tooltip);
 app.mount('#app');

@@ -48,17 +48,17 @@
 					placeholder="WhatsApp HR"
 				/>
 
+        <InputText
+          v-model="interviewForm.contact_email"
+          class="input mb-3"
+          placeholder="Email HR"
+        />
+
 				<InputMask
 					v-model="interviewForm.contact_phone"
 					class="input mb-3"
 					mask="+7 (999) 999-99-99"
 					placeholder="+7 (___) ___-__-__"
-				/>
-
-				<InputText
-					v-model="interviewForm.contact_email"
-					class="input mb-3"
-					placeholder="Email HR"
 				/>
 
 				<Button

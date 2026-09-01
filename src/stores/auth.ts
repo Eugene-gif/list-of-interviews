@@ -112,7 +112,5 @@ export const useAuthStore = defineStore('auth', () => {
     router.push('/auth');
   }
 
-  console.log('✅ Init auth store');
-
   return { signUp, signIn, signOut, refreshSession, refreshUser, email, password, isLogin, isLoading, user, accessToken, isAuth };
 })

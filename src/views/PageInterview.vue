@@ -3,7 +3,7 @@
 	import { storeToRefs } from 'pinia';
 	import { useRoute } from 'vue-router';
 	import { useInterviewStore } from '@/stores/interview';
-	import { formatDateToObjDate, formatDateToString } from '@/utils/date';
+  import { isTodayStage } from '@/utils/date';
 
 	const route = useRoute();
 	const interviewStore = useInterviewStore();
@@ -139,9 +139,9 @@
 						>
 							<Badge
 								:value="`Этап ${idx + 1}`"
-								severity="secondary"
 								class="block mr-auto mb-1"
-								style="max-width: 60px"
+                :class="isTodayStage(stage.date) ? 'bg-purple-300' : 'bg-blue-300'"
+								style="max-width: 60px; cursor: default"
 							/>
 
 							<div class="flex flex-column gap-2 mb-3">

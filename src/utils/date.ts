@@ -17,4 +17,14 @@ const formatDateToString = (dataObj: Date | null): string | null => {
   return localDate.toISOString().split('T')[0] ?? null;
 }
 
-export { formatDateToObjDate, formatDateToString };
+const isTodayStage = (dateStage: string | Date | null) => {
+  if (!dateStage) return false;
+  if (typeof dateStage === 'object') dateStage = formatDateToString(dateStage);
+
+  const newdate = new Date();
+  const today = formatDateToString(newdate);
+
+  return today === dateStage;
+};
+
+export { formatDateToObjDate, formatDateToString, isTodayStage };

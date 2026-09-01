@@ -78,7 +78,7 @@ export const useInterviewStore = defineStore('interview', () => {
         })
       };
 
-      const { data: interview, error } = await supabase
+      const { error } = await supabase
         .from('interviews')
         .update([payload])
         .eq('id', payload.id)
@@ -163,8 +163,6 @@ export const useInterviewStore = defineStore('interview', () => {
       isLoading.value = false;
     }
   }
-
-  console.log('✅ Init interview store');
 
   return { userId, interviewList, interviewForm, singleInterview, isLoading, isLoadingDelete, currentItemId, createInterview, updateInterview, deleteInterviewById, getInterviewById, getInterviews };
 })

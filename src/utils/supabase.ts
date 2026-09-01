@@ -15,8 +15,4 @@ supabase.auth.onAuthStateChange((event, session) => {
       authStore.refreshUser(session);
     }
   }
-
-  if (event === 'SIGNED_OUT') {
-    console.log('Event: ', event);
-  }
 })

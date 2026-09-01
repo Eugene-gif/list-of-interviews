@@ -6,7 +6,7 @@
 	import { formatPhoneForUI, clearPhone } from '@/utils/formatPhone';
 	import { useNotifications } from '@/composables/useNotifications';
 	import { useSortTable } from '@/composables/useSortTable';
-	import type { InterviewApp } from '@/types';
+	import { isTodayStage } from '@/utils/date';
 
 	const { showSuccess, showError } = useNotifications();
 	const { currentField, sortState, originalList, customSort } = useSortTable();
@@ -21,9 +21,9 @@
 		if (!status) return '';
 
 		const colorStatus = {
-			Offer: ['success', 'Оффер'],
-			Refusal: ['danger', 'Отказ'],
-			Pending: ['warning', 'Ожидание'],
+			Offer: ['bg-green-500', 'Оффер'],
+			Refusal: ['bg-red-500', 'Отказ'],
+			Pending: ['bg-gray-500', 'Ожидание'],
 		};
 
 		return colorStatus[status];
@@ -174,9 +174,9 @@
 							<template v-for="(stage, idx) in propsSlot.data.stages" :key="stage.id">
 								<Badge
 									:value="Number(idx) + 1"
-									class="bg-blue-300"
+									:class="isTodayStage(stage.date) ? 'bg-purple-300' : 'bg-blue-300'"
+									v-tooltip.top="isTodayStage(stage.date) ? stage.name + ' (Сегодня!)' : stage.name"
 									rounded
-									v-tooltip.top="stage.name"
 								/>
 							</template>
 						</div>
@@ -222,9 +222,10 @@
 					</template>
 
 					<template #body="propsSlot" field="status">
+						<!-- :severity="styleBadge(propsSlot.data.status)[0]" -->
 						<Badge
 							:value="styleBadge(propsSlot.data.status)[1]"
-							:severity="styleBadge(propsSlot.data.status)[0]"
+							:class="styleBadge(propsSlot.data.status)[0]"
 							rounded
 						/>
 					</template>

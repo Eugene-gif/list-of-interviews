@@ -2,13 +2,13 @@
 	const footerData = [
 		{
 			id: 1,
-			role: 'Особая благодарность за идею',
+			role: 'Идея',
 			name: 'Александр Белькевич',
 			path: 'https://telegram.me/front_everyday',
 		},
 		{
 			id: 2,
-			role: 'Разработчик',
+			role: 'Разработка',
 			name: 'Евгений Зуев',
 			path: 'https://eugene-gif.github.io/Portfolio/#home',
 		},

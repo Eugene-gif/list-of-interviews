@@ -1,5 +1,5 @@
 <script setup lang="ts">
-	import { ref, computed, watch, onMounted } from 'vue';
+	import { watch, onMounted } from 'vue';
 	import { useInterviewStore } from '@/stores/interview';
 	import { useConfirmApp } from '@/composables/useConfirmApp';
 	import { storeToRefs } from 'pinia';
@@ -146,7 +146,7 @@
 					</template>
 				</Column>
 
-				<Column class="custom-column">
+				<Column header="Этапы" class="custom-column --hide-default-header">
 					<template #header>
 						<span @click="customSort('stages')" class="custom-header color-blue-6">
 							<span>Этапы</span>
@@ -183,7 +183,7 @@
 					</template>
 				</Column>
 
-				<Column class="custom-column">
+				<Column header="Оклад" class="custom-column --hide-default-header">
 					<template #header>
 						<span @click="customSort('salary_to')" class="custom-header">
 							<span>Оклад</span>
@@ -205,7 +205,7 @@
 					</template>
 				</Column>
 
-				<Column class="custom-column">
+				<Column header="Статус" class="custom-column --hide-default-header">
 					<template #header>
 						<span @click="customSort('status')" class="custom-header">
 							<span> Статус </span>
@@ -221,8 +221,7 @@
 						</span>
 					</template>
 
-					<template #body="propsSlot" field="status">
-						<!-- :severity="styleBadge(propsSlot.data.status)[0]" -->
+					<template #body="propsSlot">
 						<Badge
 							:value="styleBadge(propsSlot.data.status)[1]"
 							:class="styleBadge(propsSlot.data.status)[0]"
@@ -314,16 +313,10 @@
 		gap: 5px;
 	}
 
-	.loader {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-
-	.empty-block {
-		font-size: 20px;
-		color: grey;
-		font-weight: 600;
+	:deep(.custom-column.--hide-default-header) {
+		.p-column-title {
+			display: none;
+		}
 	}
 
 	:deep(.custom-column) {
@@ -340,9 +333,54 @@
 		}
 	}
 
+	.loader {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.empty-block {
+		font-size: 20px;
+		color: grey;
+		font-weight: 600;
+	}
+
 	@media screen and (max-width: 960px) {
-		:deep(.custom-column) {
-			gap: 20px;
+		:deep(.p-datatable-table) {
+			.p-datatable-tbody {
+				display: flex;
+				flex-direction: column;
+				gap: 20px;
+
+				tr {
+					border-radius: 10px;
+					background-color: #f8f8f8;
+					border: 1px solid #ccc;
+				}
+
+				tr td {
+					padding: 10px 18px;
+				}
+
+				tr .custom-column {
+					gap: 10px;
+				}
+
+				tr td:first-child {
+					font-size: 24px;
+					font-weight: 700;
+				}
+
+				tr td:first-child span {
+					font-size: 1.1rem;
+					font-weight: 600;
+				}
+
+				tr td {
+					font-size: 1.1rem;
+					font-weight: 600;
+				}
+			}
 		}
 
 		.vacancy {
